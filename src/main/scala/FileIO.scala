@@ -2,7 +2,7 @@ import scala.io.Source
 
 object FileIO {
 
-type Subscription = (String, String) // (subredditName, url)
+  type Subscription = (String, String) // (subredditName, url)
 
   // Pure function to read subscriptions from a JSON file
   def readSubscriptions(): List[String] = {
