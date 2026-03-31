@@ -1,5 +1,12 @@
+import fileio.FileIO.Post // importo para tener el tipo Post
 
 object Formatters {
+
+  def filterPosts(posts: List[Post]): List[Post] = {
+    posts.filter {case (_, title, selftext, _) =>
+      (title != "") && (selftext != "") // Filtramos los posts que no tienen title ni selftext vacío
+    }
+  }
 
   // Pure function to format posts from a subscription
   def formatSubscription(url: String, posts: String): String = {

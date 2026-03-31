@@ -1,3 +1,5 @@
+package fileio // Empaqueto para usar en formatters el tipo Post
+
 import scala.io.Source
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
@@ -6,19 +8,19 @@ import java.time.{Instant, ZoneId}
 import java.time.format.DateTimeFormatter
 
 
-// REVISAR Y CONSULTAR LA IMPLEMENTACION
-// object TextProcessing {
-//   def formatDateFromUTC(utc: Long): String = {
-//     // 1. Convertimos los segundos a un objeto Instant
-//     val instant = Instant.ofEpochSecond(utc)
-    
-//     // 2. Definimos el formato (ej: Día/Mes/Año Hora:Min)
-//     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-//       .withZone(ZoneId.systemDefault()) // Esto lo pasa a la hora de tu PC (Córdoba)
 
-//     formatter.format(instant)
-//   }
-// }
+ object TextProcessing {
+   def formatDateFromUTC(utc: Long): String = {
+     // 1. Convertimos los segundos a un objeto Instant
+     val instant = Instant.ofEpochSecond(utc)
+    
+     // 2. Definimos el formato (ej: Día/Mes/Año Hora:Min)
+     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+      .withZone(ZoneId.systemDefault()) // Esto lo pasa a la hora de tu PC (Córdoba)
+
+     formatter.format(instant)
+   }
+  }
 
 object FileIO {
 

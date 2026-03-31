@@ -1,3 +1,5 @@
+import fileio.FileIO // Importo para poder tener Post
+
 object Main {
   def main(args: Array[String]): Unit = {
     val header = s"Reddit Post Parser\n${"=" * 40}"
