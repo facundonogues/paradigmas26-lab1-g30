@@ -4,7 +4,7 @@ object Formatters {
 
   def filterPosts(posts: List[Post]): List[Post] = {
     posts.filter {case (_, title, selftext, _) =>
-      (title != "") && (selftext != "") // Filtramos los posts que no tienen title ni selftext vacío
+      (title.trim != "") || (selftext.trim != "") // Filtramos los posts que no tienen title ni selftext vacío
     }
   }
 
