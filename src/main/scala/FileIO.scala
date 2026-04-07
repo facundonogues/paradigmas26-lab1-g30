@@ -36,7 +36,7 @@ object FileIO {
       Using(Source.fromFile(path))(_.mkString).toOption
 
     contentOpt.flatMap { content =>
-      val jsonOpt = parse(content).toOption
+      val jsonOpt = Try(parse(content)).toOption
 
       jsonOpt.map { json =>
         json.children.flatMap { item =>
@@ -51,23 +51,26 @@ object FileIO {
   }
 
   def downloadFeed(url: String): Option[List[Post]] = {
-    for {
-      content <- Using(Source.fromURL(url))(_.mkString).toOption
-      json    <- Try(parse(content)).toOption
-    } yield {
-      val data = (json \ "data" \ "children").children
+    val downloadOpt = Using(Source.fromURL(url))(_.mkString).toOption
 
-      data.flatMap { item =>
-        Try {
-          val subreddit = (item \ "data" \ "subreddit").extract[String]
-          val title     = (item \ "data" \ "title").extract[String]
-          val selftext  = (item \ "data" \ "selftext").extract[String]
-          val created   = (item \ "data" \ "created_utc").extract[Double].toLong
+    downloadOpt.flatMap { content =>
+      val jsonOpt = Try(parse(content)).toOption
+      
+      jsonOpt.map { json =>
+        val data = (json \ "data" \ "children").children
 
-          val date = TextProcessing.formatDateFromUTC(created)
+        data.flatMap { item =>
+          Try {
+            val subreddit = (item \ "data" \ "subreddit").extract[String]
+            val title     = (item \ "data" \ "title").extract[String]
+            val selftext  = (item \ "data" \ "selftext").extract[String]
+            val created   = (item \ "data" \ "created_utc").extract[Double].toLong
 
-          (subreddit, title, selftext, date)
-        }.toOption
+            val date = TextProcessing.formatDateFromUTC(created)
+
+            (subreddit, title, selftext, date)
+          }.toOption
+        }
       }
     }
   }
