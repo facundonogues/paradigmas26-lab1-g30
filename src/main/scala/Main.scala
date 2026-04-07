@@ -3,19 +3,35 @@ import fileio.FileIO // Importo para poder tener Post
 object Main {
   def main(args: Array[String]): Unit = {
     val header = s"Reddit Post Parser\n${"=" * 40}"
+    println(header)
 
-    val subscriptions: List[FileIO.Subscription] = FileIO.readSubscriptions("subscriptions.json")
+    val maybeSubs = FileIO.readSubscriptions("subscriptions.json")
 
-    val allPosts: List[(String, List[FileIO.Post])] = subscriptions.map { case (name, url) =>
-      println(s"Fetching posts from: $url")
-      val posts = FileIO.downloadFeed(url)
-      (url, posts)
+    maybeSubs match {
+      case None =>
+        println("Error leyendo subscriptions.json")
+
+      case Some(subscriptions) =>
+        val allPosts = subscriptions.flatMap { case (name, url) =>
+          println(s"Fetching posts from: $url")
+
+          FileIO.downloadFeed(url) match {
+            case Some(posts) =>
+              Some((url, posts))
+            case None =>
+              println(s"Error descargando: $url")
+              None
+          }
+        }
+
+        val output = allPosts
+          .map { case (url, posts) =>
+            val filtered = Formatters.filterPosts(posts)
+            Formatters.formatSubscription(url, filtered)
+          }
+          .mkString("\n")
+
+        println(output)
     }
-
-    val output = allPosts
-      .map { case (url, posts) => Formatters.formatSubscription(url, posts) }
-      .mkString("\n")
-      
-    println(output)
   }
 }

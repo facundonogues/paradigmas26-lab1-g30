@@ -6,7 +6,8 @@ import org.json4s.jackson.JsonMethods._
 
 import java.time.{Instant, ZoneId}
 import java.time.format.DateTimeFormatter
-
+import scala.util.Using
+import scala.util.Try
 
 
  object TextProcessing {
@@ -30,56 +31,44 @@ object FileIO {
 
   type Post = (String, String, String, String) // (subreddit, title, selftext, created_utc)
 
-  // Pure function to read subscriptions from a JSON file
-  def readSubscriptions(path: String): List[Subscription] = {
-    // List(
-    //   "https://www.reddit.com/r/scala/.json?count=10",
-    //   "https://www.reddit.com/r/learnprogramming/.json?count=10"
-    // )
-    val fd = Source.fromFile(path)  // File descriptor al path
-    val str = fd.mkString           // guarda el valor del fd
-    fd.close()                      // cerramos fd
+  def readSubscriptions(path: String): Option[List[Subscription]] = {
+    val contentOpt =
+      Using(Source.fromFile(path))(_.mkString).toOption
 
-    val json = parse(str)
+    contentOpt.flatMap { content =>
+      val jsonOpt = parse(content).toOption
 
-    json.children.map{item =>
-      // se extrae un string con el valor del campo name
-      val name = (item \ "name").extract[String]
-      // se extrae un string con el valor del campo url
-      val url = (item \ "url").extract[String]
-      // retorno de tupla (funcion anonima)
-      (name, url)
+      jsonOpt.map { json =>
+        json.children.flatMap { item =>
+          Try {
+            val name = (item \ "name").extract[String]
+            val url  = (item \ "url").extract[String]
+            (name, url)
+          }.toOption
+        }
+      }
     }
-
   }
 
-  // Pure function to download JSON feed from a URL
-  def downloadFeed(url: String): List[Post] = {
-    // Guardamos en source el contenido de url
-    val source = Source.fromURL(url)
-    // Guardamos el contenido en un string
-    val content = source.mkString
-    // Cerramos el fd
-    source.close()
+  def downloadFeed(url: String): Option[List[Post]] = {
+    for {
+      content <- Using(Source.fromURL(url))(_.mkString).toOption
+      json    <- Try(parse(content)).toOption
+    } yield {
+      val data = (json \ "data" \ "children").children
 
-    val json = parse(content)
+      data.flatMap { item =>
+        Try {
+          val subreddit = (item \ "data" \ "subreddit").extract[String]
+          val title     = (item \ "data" \ "title").extract[String]
+          val selftext  = (item \ "data" \ "selftext").extract[String]
+          val created   = (item \ "data" \ "created_utc").extract[Double].toLong
 
-    // Creamos lista de los posts
-    val data = (json \ "data" \ "children").children
+          val date = TextProcessing.formatDateFromUTC(created)
 
-    data.map{item =>
-      // se extrae un string con el valor del campo subreddit
-      val subreddit = (item \ "data" \ "subreddit").extract[String]
-      // se extrae un string con el valor del campo title
-      val title = (item \ "data" \ "title").extract[String]
-      // se extrae un string con el valor del campo selftext
-      val selftext = (item \ "data" \ "selftext").extract[String]
-      // se extrae el valor del campo created_utc
-      val created_utc = (item \ "data" \ "created_utc").extract[Double].toLong
-      // formateamos la fecha (Día/Mes/Año Hora:Min)
-      val date = TextProcessing.formatDateFromUTC(created_utc)
-      // retorno de tupla (funcion anonima)
-      (subreddit, title, selftext, date)
+          (subreddit, title, selftext, date)
+        }.toOption
+      }
     }
   }
 }
