@@ -17,27 +17,18 @@ object Main {
             case Some(posts) =>
               val subsScore = Formatters.scoring(posts)
               println(s"""Score de la suscripcion ${name}: ${subsScore}""")
+              val palabraMasRepetida = Formatters.countWords(posts).maxBy { case (_, value) => value }
+              println(s"""Palabra mas repetida: ${palabraMasRepetida._1}, Ocurrencias: ${palabraMasRepetida._2}""")
+              val filtered = Formatters.filterPosts(posts)
+              println(s"""Primeros 5 posts:""")
+              val firstPosts = filtered.take(5)
+              println(Formatters.formatSubscription(url, firstPosts))
               Some(posts)
             case None =>
               println(s"Error descargando: $url")
               None
           }
         }
-
-        // val output = allPosts
-        //   .map { case (url, posts) =>
-        //     val filtered = Formatters.filterPosts(posts)
-        //     Formatters.formatSubscription(url, filtered)
-        //   }
-        //   .mkString("\n")
-
-        // println(output)
-
     }
-
-    // Nombre y suma total de scores de cada Subscription LISTO
-    // Palabras más frecuentes con sus ocurrencias, tal como las extrajeron en el ejercicio 5
-    // Cinco primeros posts con su título, fecha y URL
-
   }
 }

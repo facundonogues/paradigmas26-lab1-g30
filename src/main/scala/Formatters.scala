@@ -3,27 +3,23 @@ import fileio.FileIO.Post // importo para tener el tipo Post
 object Formatters {
 
   def filterPosts(posts: List[Post]): List[Post] = {
-    posts.filter {case (_, title, selftext, _, _) =>
+    posts.filter {case (_, title, selftext, _, _, _) =>
       // Filtramos los posts que no tienen title ni selftext vacío
       (title.trim.nonEmpty) && (selftext.trim.nonEmpty) 
     }
   }
 
   def formatSubscription(url: String, posts: List[Post]): String = {
-    val header =
-      s"\n${"=" * 80}\nPosts from: $url\n${"=" * 80}"
-
     val formattedPosts = posts.map {
-      case (subreddit, title, selftext, date, score) =>
-        s"""[$date] r/$subreddit 
-            |Title: $title
-            |$selftext
-            |Score: $score
+      case (subreddit, title, selftext, date, score, url) =>
+        s"""Fecha: [$date]
+            |Titulo: $title
+            |URL: $url
             |${"-" * 40}""".stripMargin
     }
 
     //le añadi un barra n mas para que haya mas espacio entre cada post
-    header + "\n" + formattedPosts.mkString("\n\n")
+    formattedPosts.mkString("\n\n")
   }
 
   def extractWords(content: String): List[String] = {
@@ -37,13 +33,13 @@ object Formatters {
     listaPalabrasFiltrado
   }
 
-  def countWords(post: Post): Map[String, Int] = {
+  def countWords(posts: List[Post]): Map[String, Int] = {
     // Filtro que no tenga el texto vacío
-    val listaPostFiltrado = filterPosts(List(post))
+    val listaPostFiltrado = filterPosts(posts)
 
     listaPostFiltrado match {
       case Nil => Map.empty
-      case postFiltrado :: _ =>
+      case post :: _ =>
         // Armo la lista con las words
         val listaPalabras = extractWords(post._3) // Selftext 
 
@@ -65,7 +61,7 @@ object Formatters {
 
   def scoring(posts: List[Post]): Int = {
       val sum = posts.foldLeft(0) { 
-        case (acumulator, (_, _, _, _, score)) =>
+        case (acumulator, (_, _, _, _, score, _)) =>
         acumulator + score
       }
       sum
