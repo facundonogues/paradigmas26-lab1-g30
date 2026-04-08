@@ -20,7 +20,7 @@ import scala.util.Try
       .withZone(ZoneId.systemDefault()) // Esto lo pasa a la hora de tu PC (Córdoba)
 
      formatter.format(instant)
-   }
+    }
   }
 
 object FileIO {
