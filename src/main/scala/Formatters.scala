@@ -3,7 +3,7 @@ import fileio.FileIO.Post // importo para tener el tipo Post
 object Formatters {
 
   def filterPosts(posts: List[Post]): List[Post] = {
-    posts.filter {case (_, title, selftext, _) =>
+    posts.filter {case (_, title, selftext, _, _) =>
       // Filtramos los posts que no tienen title ni selftext vacío
       (title.trim.nonEmpty) && (selftext.trim.nonEmpty) 
     }
@@ -14,10 +14,11 @@ object Formatters {
       s"\n${"=" * 80}\nPosts from: $url\n${"=" * 80}"
 
     val formattedPosts = posts.map {
-      case (subreddit, title, selftext, date) =>
-        s"""[$date] r/$subreddit
+      case (subreddit, title, selftext, date, score) =>
+        s"""[$date] r/$subreddit 
             |Title: $title
             |$selftext
+            |Score: $score
             |${"-" * 40}""".stripMargin
     }
 
@@ -41,10 +42,8 @@ object Formatters {
     val listaPostFiltrado = filterPosts(List(post))
 
     listaPostFiltrado match {
-      case 0 => 0
-      case _ =>
-        // Saco el elemento (String con el selftext)
-        val postFiltrado = listaPostFiltrado.head
+      case Nil => Map.empty
+      case postFiltrado :: _ =>
         // Armo la lista con las words
         val listaPalabras = extractWords(post._3) // Selftext 
 
@@ -64,11 +63,11 @@ object Formatters {
     }
   }
 
-  // def scoring(posts: List[Post]): Int = {
-  //     val sum = posts.foldLeft(0) { 
-  //       case (acumulator, (_, _, _, _, score)) =>
-  //       acumulator + score
-  //     }
-  //     sum
-  // }
+  def scoring(posts: List[Post]): Int = {
+      val sum = posts.foldLeft(0) { 
+        case (acumulator, (_, _, _, _, score)) =>
+        acumulator + score
+      }
+      sum
+  }
 }

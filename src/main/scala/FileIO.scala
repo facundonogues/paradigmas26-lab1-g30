@@ -29,7 +29,7 @@ object FileIO {
 
   type Subscription = (String, String) // (subredditName, url)
 
-  type Post = (String, String, String, String) // (subreddit, title, selftext, created_utc)
+  type Post = (String, String, String, String, Int) // (subreddit, title, selftext, created_utc, score)
 
   def readSubscriptions(path: String): Option[List[Subscription]] = {
     val contentOpt =
@@ -68,7 +68,9 @@ object FileIO {
 
             val date = TextProcessing.formatDateFromUTC(created)
 
-            (subreddit, title, selftext, date)
+            val score  = (item \ "data" \ "score").extract[Int]
+
+            (subreddit, title, selftext, date, score)
           }.toOption
         }
       }

@@ -13,25 +13,31 @@ object Main {
 
       case Some(subscriptions) =>
         val allPosts = subscriptions.flatMap { case (name, url) =>
-          println(s"Fetching posts from: $url")
-
           FileIO.downloadFeed(url) match {
             case Some(posts) =>
-              Some((url, posts))
+              val subsScore = Formatters.scoring(posts)
+              println(s"""Score de la suscripcion ${name}: ${subsScore}""")
+              Some(posts)
             case None =>
               println(s"Error descargando: $url")
               None
           }
         }
 
-        val output = allPosts
-          .map { case (url, posts) =>
-            val filtered = Formatters.filterPosts(posts)
-            Formatters.formatSubscription(url, filtered)
-          }
-          .mkString("\n")
+        // val output = allPosts
+        //   .map { case (url, posts) =>
+        //     val filtered = Formatters.filterPosts(posts)
+        //     Formatters.formatSubscription(url, filtered)
+        //   }
+        //   .mkString("\n")
 
-        println(output)
+        // println(output)
+
     }
+
+    // Nombre y suma total de scores de cada Subscription LISTO
+    // Palabras más frecuentes con sus ocurrencias, tal como las extrajeron en el ejercicio 5
+    // Cinco primeros posts con su título, fecha y URL
+
   }
 }
