@@ -10,18 +10,18 @@ import scala.util.Using
 import scala.util.Try
 
 
- object TextProcessing {
-   def formatDateFromUTC(utc: Long): String = {
-     // 1. Convertimos los segundos a un objeto Instant
-     val instant = Instant.ofEpochSecond(utc)
+object TextProcessing {
+  def formatDateFromUTC(utc: Long): String = {
+    // 1. Convertimos los segundos a un objeto Instant
+    val instant = Instant.ofEpochSecond(utc)
     
-     // 2. Definimos el formato (ej: Día/Mes/Año Hora:Min)
-     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+    // 2. Definimos el formato (ej: Día/Mes/Año Hora:Min)
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
       .withZone(ZoneId.systemDefault()) // Esto lo pasa a la hora de tu PC (Córdoba)
 
-     formatter.format(instant)
-    }
+    formatter.format(instant)
   }
+}
 
 object FileIO {
 
