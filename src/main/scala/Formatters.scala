@@ -9,17 +9,20 @@ object Formatters {
     }
   }
 
-  def formatSubscription(url: String, posts: List[Post]): String = {
+  def formatSubscription(name: String,score: Int, repeatedWord: (String, Int), posts: List[Post]): String = {
+    val header = s"""Score de la suscripcion ${name}: ${score}
+        Palabra mas repetida: ${repeatedWord._1}, Ocurrencias: ${repeatedWord._2}
+        Primeros 5 posts:"""
     val formattedPosts = posts.map {
       case (subreddit, title, selftext, date, score, url) =>
-        s"""Fecha: [$date]
-            |Titulo: $title
-            |URL: $url
-            |${"-" * 40}""".stripMargin
+        s"""|Fecha: [$date]
+        |Titulo: $title
+        |URL: $url
+        |${"-" * 40}""".stripMargin
     }
 
     //le añadi un barra n mas para que haya mas espacio entre cada post
-    formattedPosts.mkString("\n\n")
+    header + "\n" + formattedPosts.mkString("\n\n")
   }
 
   def extractWords(content: String): List[String] = {

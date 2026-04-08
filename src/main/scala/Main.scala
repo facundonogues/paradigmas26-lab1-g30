@@ -16,13 +16,11 @@ object Main {
           FileIO.downloadFeed(url) match {
             case Some(posts) =>
               val subsScore = Formatters.scoring(posts)
-              println(s"""Score de la suscripcion ${name}: ${subsScore}""")
               val palabraMasRepetida = Formatters.countWords(posts).maxBy { case (_, value) => value }
-              println(s"""Palabra mas repetida: ${palabraMasRepetida._1}, Ocurrencias: ${palabraMasRepetida._2}""")
               val filtered = Formatters.filterPosts(posts)
-              println(s"""Primeros 5 posts:""")
               val firstPosts = filtered.take(5)
-              println(Formatters.formatSubscription(url, firstPosts))
+              val finalFormat = Formatters.formatSubscription(name, subsScore, palabraMasRepetida, firstPosts)
+              println(finalFormat)
               Some(posts)
             case None =>
               println(s"Error descargando: $url")
