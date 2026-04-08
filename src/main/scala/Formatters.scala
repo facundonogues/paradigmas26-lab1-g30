@@ -17,7 +17,7 @@ object Formatters {
       case (subreddit, title, selftext, date) =>
         s"""[$date] r/$subreddit
             |Title: $title
-            |$selfText
+            |$selftext
             |${"-" * 40}""".stripMargin
     }
 
