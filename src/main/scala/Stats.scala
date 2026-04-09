@@ -1,8 +1,9 @@
+import fileio.FileIO.Post
 object Stats{
     
   def scoring(posts: List[Post]): Int = {
     val sum = posts.foldLeft(0) { 
-      case (acumulator, (_, _, _, _, score)) =>
+      case (acumulator, (_, _, _, _, score, _)) =>
       acumulator + score
     }
     sum
@@ -20,7 +21,7 @@ object Stats{
 
   def countWords(post: Post): Map[String, Int] = {
     // Filtro que no tenga el texto vacío
-    val listaPostFiltrado = filterPosts(List(post))
+    val listaPostFiltrado = Formatters.filterPosts(List(post))
 
     listaPostFiltrado match {
       case Nil => Map.empty

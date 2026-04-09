@@ -10,12 +10,18 @@ object Formatters {
   }
 
   def formatSubscription(name: String,score: Int, repeatedWord: (String, Int), posts: List[Post]): String = {
-    val header = s"""Score de la suscripcion ${name}: ${score}
-        Palabra mas repetida: ${repeatedWord._1}, Ocurrencias: ${repeatedWord._2}
-        Primeros 5 posts:"""
+    val header = s"""
+      |${"-" * 80}
+      |${" " * 31}Suscripcion $name
+      |${"-" * 80}
+      |Score total: $score
+      |Palabra mas repetida: ${repeatedWord._1}, Ocurrencias: ${repeatedWord._2}
+      |Primeros 5 posts:
+      |""".stripMargin
     val formattedPosts = posts.map {
       case (subreddit, title, selftext, date, score, url) =>
-        s"""|Fecha: [$date]
+        s"""
+        |Fecha: [$date]
         |Titulo: $title
         |URL: $url
         |${"-" * 40}""".stripMargin
