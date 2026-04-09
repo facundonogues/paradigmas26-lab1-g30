@@ -11,16 +11,16 @@ import scala.util.Try
 
 
 object TextProcessing {
-  def formatDateFromUTC(utc: Long): String = {
+  def formatDateFromUTC(utc: Long, zone: ZoneId): Option[String] = Try {
     // 1. Convertimos los segundos a un objeto Instant
     val instant = Instant.ofEpochSecond(utc)
     
     // 2. Definimos el formato (ej: Día/Mes/Año Hora:Min)
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-      .withZone(ZoneId.systemDefault()) // Esto lo pasa a la hora de tu PC (Córdoba)
+      .withZone(zone)
 
     formatter.format(instant)
-  }
+  }.toOption
 }
 
 object FileIO {
@@ -67,7 +67,8 @@ object FileIO {
             val url  = (item \ "data" \ "url").extract[String]
             val created   = (item \ "data" \ "created_utc").extract[Double].toLong
 
-            val date = TextProcessing.formatDateFromUTC(created)
+            val zone = ZoneId.systemDefault() // zona horaria local
+            val date = TextProcessing.formatDateFromUTC(created, zone).getOrElse("Fecha no disponible")
 
             val score  = (item \ "data" \ "score").extract[Int]
 
