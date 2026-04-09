@@ -17,19 +17,19 @@ object Main {
 
           val result = FileIO.downloadFeed(url) match {
             case Some(posts) =>
+              val subsScore = Formatters.scoring(posts)
+              val palabraMasRepetida = Formatters.countWords(posts).maxBy { case (_, value) => value }
               val filtered = Formatters.filterPosts(posts)
-              val formatted = Formatters.formatSubscription(url, filtered)
-              fetchMsg + formatted
-
+              val firstPosts = filtered.take(5)
+              val finalFormat = Formatters.formatSubscription(name, subsScore, palabraMasRepetida, firstPosts)
+              println(finalFormat)
+              Some(posts)
             case None =>
               fetchMsg + s"Error descargando: $url\n"
           }
 
           result
         }
-
-        val output = results.mkString("\n")
-        println(output)
     }
   }
 }

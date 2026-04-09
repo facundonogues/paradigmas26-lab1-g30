@@ -29,7 +29,7 @@ object FileIO {
 
   type Subscription = (String, String) // (subredditName, url)
 
-  type Post = (String, String, String, String, Int) // (subreddit, title, selftext, created_utc, score)
+  type Post = (String, String, String, String, Int, String) // (subreddit, title, selftext, created_utc, score, url)
 
   def readSubscriptions(path: String): Option[List[Subscription]] = {
     val contentOpt =
@@ -64,13 +64,14 @@ object FileIO {
             val subreddit = (item \ "data" \ "subreddit").extract[String]
             val title     = (item \ "data" \ "title").extract[String]
             val selftext  = (item \ "data" \ "selftext").extract[String]
+            val url  = (item \ "data" \ "url").extract[String]
             val created   = (item \ "data" \ "created_utc").extract[Double].toLong
 
             val date = TextProcessing.formatDateFromUTC(created)
 
             val score  = (item \ "data" \ "score").extract[Int]
 
-            (subreddit, title, selftext, date, score)
+            (subreddit, title, selftext, date, score, url)
           }.toOption
         }
       }
